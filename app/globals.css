@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Adjusted to be more gray by reducing saturation */
+    --background: 220 15% 10%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 15% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 15% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 15% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 15% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 15% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 15% 17.5%;
+    --input: 217.2 15% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.cm-error-underline {
+  text-decoration: wavy underline red;
+}
+
+/* Explicit Markdown Styling */
+.markdown-preview h1 {
+  @apply text-2xl font-bold mt-6 mb-4;
+}
+
+.markdown-preview h2 {
+  @apply text-xl font-bold mt-5 mb-3;
+}
+
+.markdown-preview h3 {
+  @apply text-lg font-bold mt-4 mb-2;
+}
+
+.markdown-preview p {
+  @apply my-3;
+}
+
+.markdown-preview ul {
+  @apply list-disc pl-6 my-3;
+}
+
+.markdown-preview ol {
+  @apply list-decimal pl-6 my-3;
+}
+
+.markdown-preview li {
+  @apply my-1;
+}
+
+.markdown-preview blockquote {
+  @apply border-l-4 border-gray-300 dark:border-gray-700 pl-4 italic my-3;
+}
+
+.markdown-preview code {
+  @apply bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm;
+}
+
+.markdown-preview pre {
+  @apply bg-gray-100 dark:bg-gray-800 p-3 rounded my-3 overflow-auto;
+}
+
+.markdown-preview a {
+  @apply text-blue-600 dark:text-blue-400 hover:underline;
+}
+
+.markdown-preview table {
+  @apply border-collapse w-full my-3;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+  @apply border border-gray-300 dark:border-gray-700 px-3 py-2;
+}
+
+.markdown-preview th {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+/* Dark mode specific styles */
+.dark .markdown-preview {
+  @apply text-gray-100;
+}
+
+.dark .markdown-preview h1,
+.dark .markdown-preview h2,
+.dark .markdown-preview h3,
+.dark .markdown-preview h4,
+.dark .markdown-preview h5,
+.dark .markdown-preview h6 {
+  @apply text-white;
+}
+
