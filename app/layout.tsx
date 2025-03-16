@@ -4,14 +4,16 @@ import { Toaster } from "@/components/ui/toaster"
 import "@/app/globals.css"
 
 export const metadata = {
-  title: "TempoScript - Timed Markdown Presentation Guide",
+  title: "TempoScript: Guided Markdown Presentations",
   description:
-    "Discover TempoScript – a minimalist web app that transforms your Markdown presentation script into a guided, timed performance. Ideal for cue-based presentations when traditional tools aren't available.",
+    "Create timed, cue-based presentations from your Markdown scripts. TempoScript is a minimalist web app for guided performances, perfect when traditional presentation tools aren't an option.",
+  keywords:
+    "markdown, presentation, timed, cue-based, performance, web app, minimalist, guided",
   metadataBase: new URL("https://www.temposcript.com"),
   openGraph: {
     type: "website",
     url: "https://www.temposcript.com",
-    title: "TempoScript - Timed Markdown Presentation Guide",
+    title: "TempoScript: Guided Markdown Presentations",
     description:
       "Discover TempoScript – a minimalist web app that transforms your Markdown presentation script into a guided, timed performance. Ideal for cue-based presentations when traditional tools aren't available.",
     images: [
@@ -26,7 +28,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TempoScript - Timed Markdown Presentation Guide",
+    title: "TempoScript: Guided Markdown Presentations",
     description:
       "Discover TempoScript – a minimalist web app that transforms your Markdown presentation script into a guided, timed performance. Ideal for cue-based presentations when traditional tools aren't available.",
     images: ["/og-image.png"],
