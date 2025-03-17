@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect, useRef } from "react"
-import ReactMarkdown from "react-markdown"
+import { useState, useMemo, useCallback, useEffect, useRef, type PropsWithChildren } from "react"
+import ReactMarkdown, { type Components } from "react-markdown"
 import { TimerControl } from "./timer-control"
 import type { ContentBlock, PresentationState } from "@/types/presentation"
 import { useInterval } from "@/hooks/use-interval"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card } from "@/components/ui/card"
 import { Keyboard } from "lucide-react"
+
 
 interface PresentationViewProps {
   blocks: ContentBlock[]
@@ -18,6 +19,7 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
   const [state, setState] = useState<PresentationState>({
     currentBlockIndex: 0,
     isPlaying: false,
+    shouldAdvance: false,
     totalElapsedTime: 0,
     blockElapsedTime: 0,
     parentElapsedTime: 0,
@@ -249,6 +251,22 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
     }
   }, [state.currentBlockIndex, lastDirection])
 
+  const code = useCallback(
+    ({ node, className, children, ...props }: PropsWithChildren<any>) => {
+      return (
+        <code className="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded text-sm text-gray-900 dark:text-gray-100" {...props}>{children}</code>
+      )
+    },
+    []
+  )
+  const pre = useCallback(
+    ({ node, ...props }: PropsWithChildren<any>) => {
+      return <pre className="bg-gray-200 dark:bg-gray-800 p-3 rounded my-3 overflow-auto dark:text-gray-100" {...props} />
+    },
+    []
+  )
+
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {showShortcuts && (
@@ -289,17 +307,20 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
             <ThemeToggle />
           </div>
         </div>
-
-        <div className="prose max-w-none dark:prose-invert">
+        <div className="max-w-none prose dark:prose-invert">
           {blocks.map((block, index) => (
             <div
               key={index}
-              ref={(el) => (blockRefs.current[index] = el)}
+              ref={(el) => {
+                if (el) {
+                  blockRefs.current[index] = el
+                }
+              }}
               className={`transition-opacity duration-200 ${
                 index === state.currentBlockIndex ? "opacity-100" : "opacity-30"
               }`}
             >
-              <ReactMarkdown>{block.content}</ReactMarkdown>
+              <ReactMarkdown components={{ code, pre }}>{block.content}</ReactMarkdown>
             </div>
           ))}
         </div>

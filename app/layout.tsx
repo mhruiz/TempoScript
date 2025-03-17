@@ -1,21 +1,20 @@
 import type React from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { BASE_URL, TITLE, DESCRIPTION } from "@/lib/config"
 import "@/app/globals.css"
 
 export const metadata = {
-  title: "TempoScript: Guided Markdown Presentations",
-  description:
-    "Create timed, cue-based presentations from your Markdown scripts. TempoScript is a minimalist web app for guided performances, perfect when traditional presentation tools aren't an option.",
+  title: TITLE,
+  description: DESCRIPTION,
   keywords:
-    "markdown, presentation, timed, cue-based, performance, web app, minimalist, guided",
-  metadataBase: new URL("https://www.temposcript.com"),
+    "markdown, presentation, timed, cue-based, performance, web app, minimalist, guided, marks",
+  metadataBase: new URL(BASE_URL),
   openGraph: {
     type: "website",
-    url: "https://www.temposcript.com",
-    title: "TempoScript: Guided Markdown Presentations",
-    description:
-      "Discover TempoScript – a minimalist web app that transforms your Markdown presentation script into a guided, timed performance. Ideal for cue-based presentations when traditional tools aren't available.",
+    url: BASE_URL,
+    title: TITLE,
+    description: DESCRIPTION,
     images: [
       {
         url: "/og-image.png",
@@ -28,9 +27,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TempoScript: Guided Markdown Presentations",
-    description:
-      "Discover TempoScript – a minimalist web app that transforms your Markdown presentation script into a guided, timed performance. Ideal for cue-based presentations when traditional tools aren't available.",
+    title: TITLE,
+    description: DESCRIPTION,
     images: ["/og-image.png"],
   },
   icons: {
@@ -44,7 +42,7 @@ export const metadata = {
     other: [{ rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#5bbad5" }],
   },
   manifest: "/site.webmanifest",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -52,10 +50,24 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": TITLE,
+    "url": BASE_URL,
+    "description": DESCRIPTION
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* Schema Markup como JSON stringificado */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        />
+        <link rel="canonical" href={BASE_URL} />
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
@@ -66,7 +78,3 @@ export default function RootLayout({
     </html>
   )
 }
-
-
-
-import './globals.css'
