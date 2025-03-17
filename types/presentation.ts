@@ -21,5 +21,5 @@ export interface PresentationState {
   totalElapsedTime: number
   blockElapsedTime: number
   parentElapsedTime: number
+  shouldAdvance: boolean
 }
-
