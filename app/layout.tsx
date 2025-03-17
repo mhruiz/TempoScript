@@ -42,7 +42,7 @@ export const metadata = {
     other: [{ rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#5bbad5" }],
   },
   manifest: "/site.webmanifest",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -50,11 +50,24 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": TITLE,
+    "url": BASE_URL,
+    "description": DESCRIPTION
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="canonical" href={`${BASE_URL}`} />
+        {/* Schema Markup como JSON stringificado */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        />
+        <link rel="canonical" href={BASE_URL} />
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
@@ -65,7 +78,3 @@ export default function RootLayout({
     </html>
   )
 }
-
-
-
-import './globals.css'
