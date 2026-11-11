@@ -22,6 +22,7 @@ import { EditorToolbar } from "@/components/editor/editor-toolbar"
 import { Preview } from "@/components/editor/preview"
 import { PresentationView } from "@/components/presentation/presentation-view"
 import { parseContent, validateTimeMarkers } from "@/lib/time-marker"
+import { hasText } from "@/lib/presentation"
 import { decodeScriptFromHash, encodeScriptToHash } from "@/lib/share"
 import { DEFAULT_MARKDOWN_CONTENT } from "@/lib/constants"
 import { REPO_URL } from "@/lib/config"
@@ -138,7 +139,8 @@ export function EditorApp({ children }: EditorAppProps) {
 
   const errors = useMemo(() => validateTimeMarkers(content), [content])
   const blocks = useMemo(() => parseContent(content), [content])
-  const canPresent = errors.length === 0 && blocks.length > 0
+  const hasSections = blocks.some(hasText)
+  const canPresent = errors.length === 0 && hasSections
 
   // Replace the script, asking first if that would discard the user's own work
   const requestReplace = useCallback(
@@ -273,12 +275,13 @@ export function EditorApp({ children }: EditorAppProps) {
           </Alert>
         )}
 
-        {errors.length === 0 && blocks.length === 0 && (
+        {errors.length === 0 && !hasSections && (
           <Alert className="mb-6">
             <Info className="h-4 w-4" />
             <AlertTitle>No timed sections yet</AlertTitle>
             <AlertDescription>
-              Add a time marker such as <code>?05:00</code> on its own line before a section to start presenting.
+              Add a time marker such as <code>?05:00</code> on its own line, with the text of the section below it, to
+              start presenting.
             </AlertDescription>
           </Alert>
         )}

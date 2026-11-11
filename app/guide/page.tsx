@@ -147,7 +147,8 @@ export default function GuidePage() {
           <p className={muted}>
             This talk has a planned length of 6 minutes 30 seconds: the three timed top-level sections add up to that,
             and the final questions section is untimed. Text before the first marker is not part of any section and is
-            not shown in presentation mode.
+            not shown in presentation mode. A marker with no text below it, such as a section that starts directly
+            with a sub-section, sets the time for that section but is not a stop of its own.
           </p>
         </section>
 
@@ -244,11 +245,11 @@ export default function GuidePage() {
             </li>
             <li>
               <strong className="text-foreground">Block</strong>: time spent in the current section, next to its
-              planned time.
+              planned time. For a section that has sub-sections, this includes the time spent in them.
             </li>
             <li>
               <strong className="text-foreground">Parent</strong>: shown inside a sub-section. Time spent in the
-              top-level section, next to its planned time.
+              whole parent section, next to its planned time. A third-level section shows both of its parents.
             </li>
             <li>
               <strong className="text-foreground">Progress bar</strong>: fills as the section&apos;s time passes. It
@@ -256,12 +257,15 @@ export default function GuidePage() {
             </li>
             <li>
               <strong className="text-foreground">Auto-advance</strong>: when on, the app moves to the next section
-              as soon as the current one runs out of time. Untimed sections never advance by themselves.
+              as soon as the current one runs out of time. Untimed sections never advance by themselves, and neither
+              does a section you return to after its time ran out.
             </li>
           </ul>
           <p className={muted}>
-            Moving to another section resets the section timer. The total keeps counting until you pause or exit.
-            The timers follow the clock, so they stay correct if the tab is in the background. Where the browser
+            Each section remembers the time you spent in it. If you go back to a section, its timer continues from
+            where it was, so the section times always add up to the total. The total turns red only when the timed
+            sections have used more than planned; time in untimed sections does not count against it. The timers
+            follow the clock, so they stay correct if the tab is in the background. Where the browser
             allows it, the screen stays awake while you present.
           </p>
           <p className={muted}>

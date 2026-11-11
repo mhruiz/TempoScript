@@ -107,7 +107,9 @@ export function parseContent(markdown: string): ContentBlock[] {
     const marker = parseTimeMarker(line)
 
     if (marker) {
-      if (content.length > 0 && currentBlock) {
+      // A block is kept even with no text: a section whose marker is followed
+      // directly by a sub-section still owns that section's time
+      if (currentBlock) {
         currentBlock.content = content.join("\n")
         blocks.push(currentBlock)
       }
@@ -124,7 +126,7 @@ export function parseContent(markdown: string): ContentBlock[] {
     }
   }
 
-  if (content.length > 0 && currentBlock) {
+  if (currentBlock) {
     currentBlock.content = content.join("\n")
     blocks.push(currentBlock)
   }

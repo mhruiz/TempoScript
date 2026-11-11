@@ -1,11 +1,18 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect, useRef } from "react"
+import { useState, useMemo, useCallback, useEffect, useReducer, useRef } from "react"
 import ReactMarkdown, { type Components } from "react-markdown"
 import { TimerControl } from "./timer-control"
 import type { ContentBlock } from "@/types/presentation"
 import { useInterval } from "@/hooks/use-interval"
-import { plannedTotalSeconds, topLevelIndex } from "@/lib/presentation"
+import {
+  buildModel,
+  initialTimerState,
+  selectView,
+  timerReducer,
+  type TimerAction,
+  type TimerState,
+} from "@/lib/presentation"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -32,122 +39,53 @@ const DEFAULT_TEXT_SIZE = 1
 const TEXT_SIZE_KEY = "temposcript-text-size"
 const TICK_MS = 250
 
-interface TimerState {
-  currentBlockIndex: number
-  isPlaying: boolean
-  // Elapsed times in milliseconds
-  totalElapsed: number
-  blockElapsed: number
-  parentElapsed: number
-}
-
 interface PresentationViewProps {
   blocks: ContentBlock[]
   onEnd: () => void
 }
 
 export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
-  const [state, setState] = useState<TimerState>({
-    currentBlockIndex: 0,
-    isPlaying: false,
-    totalElapsed: 0,
-    blockElapsed: 0,
-    parentElapsed: 0,
-  })
+  // All timing lives in the reducer in lib/presentation.ts
+  const model = useMemo(() => buildModel(blocks), [blocks])
+  const [state, dispatch] = useReducer(
+    (current: TimerState, action: TimerAction) => timerReducer(model, current, action),
+    model,
+    initialTimerState,
+  )
+  const view = selectView(model, state)
   const [showShortcuts, setShowShortcuts] = useState(true)
   const [autoAdvance, setAutoAdvance] = useState(false)
   const [textSize, setTextSize] = useState(DEFAULT_TEXT_SIZE)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [lastDirection, setLastDirection] = useState<"forward" | "backward">("forward")
   const blockRefs = useRef<(HTMLDivElement | null)[]>([])
-  const lastTickRef = useRef(0)
 
-  const totalTime = useMemo(() => plannedTotalSeconds(blocks), [blocks])
-
-  const currentBlock = blocks[state.currentBlockIndex]
-  const currentTime = currentBlock?.timeMarker?.time || 0
-  const isNoTimeControl = currentBlock?.timeMarker?.noTimeControl || false
-
-  // The top-level block that contains the current nested block
-  const parentBlock = useMemo(() => {
-    if (!currentBlock?.timeMarker || currentBlock.timeMarker.level <= 1) return null
-    const parentIndex = topLevelIndex(blocks, state.currentBlockIndex)
-    return parentIndex === null ? null : blocks[parentIndex]
-  }, [blocks, state.currentBlockIndex, currentBlock])
-
-  // Move by `step` blocks. The parent timer restarts only when the move
-  // crosses into a different top-level section.
-  const move = useCallback(
-    (step: 1 | -1) => {
-      setLastDirection(step === 1 ? "forward" : "backward")
-      setState((prev) => {
-        const nextIndex = prev.currentBlockIndex + step
-        if (nextIndex < 0 || nextIndex >= blocks.length) return prev
-        const sameSection = topLevelIndex(blocks, nextIndex) === topLevelIndex(blocks, prev.currentBlockIndex)
-        return {
-          ...prev,
-          currentBlockIndex: nextIndex,
-          blockElapsed: 0,
-          parentElapsed: sameSection ? prev.parentElapsed : 0,
-        }
-      })
-    },
-    [blocks],
-  )
-
+  const move = useCallback((step: 1 | -1) => {
+    setLastDirection(step === 1 ? "forward" : "backward")
+    dispatch({ type: "move", step, now: Date.now() })
+  }, [])
   const handleNext = useCallback(() => move(1), [move])
   const handlePrevious = useCallback(() => move(-1), [move])
+  const togglePlay = useCallback(() => dispatch({ type: "toggle", now: Date.now() }), [])
 
-  const setPlaying = useCallback((isPlaying: boolean | ((prev: boolean) => boolean)) => {
-    setState((prev) => {
-      const next = typeof isPlaying === "function" ? isPlaying(prev.isPlaying) : isPlaying
-      if (next === prev.isPlaying) return prev
-      if (next) lastTickRef.current = Date.now()
-      return { ...prev, isPlaying: next }
-    })
-  }, [])
-
-  // Advance the timers by the real time that has passed since the last tick,
-  // so they stay correct when the browser slows timers in a background tab
+  // Each tick counts the real time since the last one, so the timers stay
+  // correct when the browser slows them down in a background tab
   useInterval(
-    () => {
-      const now = Date.now()
-      const delta = Math.max(0, now - lastTickRef.current)
-      lastTickRef.current = now
-
-      setState((prev) => {
-        if (!prev.isPlaying) return prev
-        const blockElapsed = prev.blockElapsed + delta
-        const next = {
-          ...prev,
-          totalElapsed: prev.totalElapsed + delta,
-          blockElapsed,
-          parentElapsed: prev.parentElapsed + delta,
-        }
-
-        const block = blocks[prev.currentBlockIndex]
-        const blockTime = block?.timeMarker?.time ?? 0
-        const shouldAdvance =
-          autoAdvance &&
-          !block?.timeMarker?.noTimeControl &&
-          blockTime > 0 &&
-          blockElapsed >= blockTime * 1000 &&
-          prev.currentBlockIndex < blocks.length - 1
-
-        if (!shouldAdvance) return next
-
-        const nextIndex = prev.currentBlockIndex + 1
-        const sameSection = topLevelIndex(blocks, nextIndex) === topLevelIndex(blocks, prev.currentBlockIndex)
-        return {
-          ...next,
-          currentBlockIndex: nextIndex,
-          blockElapsed: 0,
-          parentElapsed: sameSection ? next.parentElapsed : 0,
-        }
-      })
-    },
+    () => dispatch({ type: "tick", now: Date.now(), autoAdvance }),
     state.isPlaying ? TICK_MS : null,
   )
+
+  // Count the time up to now as soon as the tab is visible again,
+  // instead of waiting for the next tick
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        dispatch({ type: "tick", now: Date.now(), autoAdvance })
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibility)
+    return () => document.removeEventListener("visibilitychange", handleVisibility)
+  }, [autoAdvance])
 
   // Text size: remember the choice between presentations
   useEffect(() => {
@@ -226,7 +164,8 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return
+      // Holding a key down must not skip sections or flicker play/pause
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return
 
       const target = e.target as HTMLElement | null
       const onControl = target?.closest("button, a, input, [role='switch']") != null
@@ -236,10 +175,10 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
       switch (e.key.length === 1 ? e.key.toLowerCase() : e.key) {
         case " ":
           e.preventDefault()
-          setPlaying((prev) => !prev)
+          togglePlay()
           break
         case "p":
-          setPlaying((prev) => !prev)
+          togglePlay()
           break
         case "ArrowRight":
         case "n":
@@ -271,11 +210,11 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [setPlaying, handleNext, handlePrevious, onEnd, toggleFullscreen, changeTextSize])
+  }, [togglePlay, handleNext, handlePrevious, onEnd, toggleFullscreen, changeTextSize])
 
   // Keep the current block in view
   useEffect(() => {
-    const currentBlockElement = blockRefs.current[state.currentBlockIndex]
+    const currentBlockElement = blockRefs.current[view.blockIndex]
     if (!currentBlockElement) return
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -291,12 +230,13 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
       // A long block: show its start when moving forward, its end when moving back
       currentBlockElement.scrollIntoView({ behavior, block: lastDirection === "forward" ? "start" : "end" })
     }
-  }, [state.currentBlockIndex, lastDirection, textSize])
+  }, [view.blockIndex, lastDirection, textSize])
 
   return (
     <div className="min-h-screen bg-background pb-40">
+      {/* Shown only on devices with a mouse or trackpad: touch screens have no keyboard */}
       {showShortcuts && (
-        <Card className="fixed top-20 right-4 p-3 z-10 hidden bg-background/80 backdrop-blur-sm border shadow-md sm:block">
+        <Card className="fixed top-20 right-4 p-3 z-10 hidden bg-background/80 backdrop-blur-sm border shadow-md [@media(hover:hover)_and_(pointer:fine)]:block">
           <div className="flex items-center gap-2 mb-2">
             <Keyboard className="h-4 w-4" />
             <span className="text-sm font-medium">Keyboard Shortcuts</span>
@@ -370,40 +310,30 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
           </div>
         </div>
         <div className={`max-w-none prose dark:prose-invert ${TEXT_SIZES[textSize]}`}>
-          {blocks.map((block, index) => (
+          {model.steps.map((index) => (
             <div
               key={index}
               ref={(el) => {
                 blockRefs.current[index] = el
               }}
-              aria-current={index === state.currentBlockIndex ? "step" : undefined}
+              aria-current={index === view.blockIndex ? "step" : undefined}
               className={`transition-opacity duration-200 ${
-                index === state.currentBlockIndex ? "opacity-100" : "opacity-30"
+                index === view.blockIndex ? "opacity-100" : "opacity-30"
               }`}
             >
-              <ReactMarkdown components={markdownComponents}>{block.content}</ReactMarkdown>
+              <ReactMarkdown components={markdownComponents}>{blocks[index].content}</ReactMarkdown>
             </div>
           ))}
         </div>
       </div>
 
       <TimerControl
-        totalTime={totalTime}
-        blockTime={currentTime}
-        totalElapsed={Math.floor(state.totalElapsed / 1000)}
-        blockElapsed={Math.floor(state.blockElapsed / 1000)}
+        view={view}
         isPlaying={state.isPlaying}
-        isFirst={state.currentBlockIndex === 0}
-        isLast={state.currentBlockIndex === blocks.length - 1}
-        position={`${state.currentBlockIndex + 1}/${blocks.length}`}
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
+        onPlayPause={togglePlay}
         onNext={handleNext}
         onPrevious={handlePrevious}
         onEnd={onEnd}
-        noTimeControl={isNoTimeControl}
-        parentTime={parentBlock?.timeMarker?.noTimeControl ? undefined : parentBlock?.timeMarker?.time}
-        parentElapsed={Math.floor(state.parentElapsed / 1000)}
         autoAdvance={autoAdvance}
         onAutoAdvanceChange={setAutoAdvance}
       />

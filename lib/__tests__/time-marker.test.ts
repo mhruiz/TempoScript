@@ -86,6 +86,14 @@ describe("parseContent", () => {
     expect(blocks[0].content).toBe("Body")
   })
 
+  it("keeps a section that has no text before its first sub-section", () => {
+    const blocks = parseContent("?05:00\n??02:00\nText")
+    expect(blocks.map((b) => [b.timeMarker?.level, b.timeMarker?.time, b.content])).toEqual([
+      [1, 300, ""],
+      [2, 120, "Text"],
+    ])
+  })
+
   it("returns no blocks when the script has no markers", () => {
     expect(parseContent("# Just markdown")).toEqual([])
   })
