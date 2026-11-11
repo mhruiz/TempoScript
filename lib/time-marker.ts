@@ -1,5 +1,3 @@
-"use client"
-
 import type { TimeMarker, ValidationError, ContentBlock } from "@/types/presentation"
 
 const TIME_MARKER_REGEX = /^(\?+)(!!)?\s*(\d{2}):(\d{2})\s*$/
@@ -20,7 +18,7 @@ export function parseTimeMarker(line: string): TimeMarker | null {
     return null
   }
 
-  const [_, questionMarks, noTimeControl, minutes, seconds] = match
+  const [, questionMarks, noTimeControl, minutes, seconds] = match
   const secondsValue = Number.parseInt(seconds)
 
   // Always validate seconds are multiples of 5
@@ -105,7 +103,7 @@ export function parseContent(markdown: string): ContentBlock[] {
   let currentBlock: ContentBlock | null = null
   let content: string[] = []
 
-  lines.forEach((line) => {
+  for (const line of lines) {
     const marker = parseTimeMarker(line)
 
     if (marker) {
@@ -124,7 +122,7 @@ export function parseContent(markdown: string): ContentBlock[] {
       // Don't include control markers in content
       content.push(line)
     }
-  })
+  }
 
   if (content.length > 0 && currentBlock) {
     currentBlock.content = content.join("\n")

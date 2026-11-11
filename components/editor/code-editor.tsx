@@ -3,7 +3,7 @@
 import { useRef, useCallback, useEffect } from "react"
 import CodeMirror from "@uiw/react-codemirror"
 import { markdown } from "@codemirror/lang-markdown"
-import { validateTimeMarkers } from "@/lib/time-marker"
+import { useTheme } from "next-themes"
 import type { ValidationError } from "@/types/presentation"
 import { Decoration, EditorView } from "@codemirror/view"
 import { StateField, StateEffect } from "@codemirror/state"
@@ -12,7 +12,6 @@ import { X } from "lucide-react"
 interface CodeEditorProps {
   value: string
   onChange: (value: string) => void
-  onValidationChange: (errors: ValidationError[]) => void
   errors: ValidationError[]
   isExpanded: boolean
   onExpand: () => void
@@ -50,33 +49,33 @@ const errorField = StateField.define({
 export function CodeEditor({
   value,
   onChange,
-  onValidationChange,
   errors,
   isExpanded,
   onExpand,
   onCollapse,
 }: CodeEditorProps) {
-  const view = useRef<EditorView>()
+  const view = useRef<EditorView | null>(null)
   const editorRef = useRef<HTMLDivElement>(null)
 
-  const handleChange = useCallback(
-    (value: string) => {
-      onChange(value)
-      const errors = validateTimeMarkers(value)
-      onValidationChange(errors)
-    },
-    [onChange, onValidationChange],
-  )
+  // Dark until the theme is known, so the editor does not flash on load
+  const { resolvedTheme } = useTheme()
+  const editorTheme = resolvedTheme === "light" ? "light" : "dark"
 
   // Update error decorations when errors change
   useEffect(() => {
     if (view.current) {
       const lines = value.split("\n")
-      const effects = errors.map((error) => {
-        const lineStart = lines.slice(0, error.line).reduce((acc, line) => acc + line.length + 1, 0)
-        const lineEnd = lineStart + lines[error.line].length
-        return addErrorMark.of({ from: lineStart, to: lineEnd })
-      })
+      const docLength = view.current.state.doc.length
+      const effects = errors
+        .map((error) => {
+          const lineStart = lines.slice(0, error.line).reduce((acc, line) => acc + line.length + 1, 0)
+          const lineEnd = lineStart + (lines[error.line]?.length ?? 0)
+          return { from: lineStart, to: lineEnd }
+        })
+        // Skip ranges the editor cannot mark: empty ones, or ones past the end
+        // when the editor has not caught up with a replaced script yet
+        .filter((range) => range.from < range.to && range.to <= docLength)
+        .map((range) => addErrorMark.of(range))
 
       view.current.dispatch({
         effects,
@@ -157,9 +156,9 @@ export function CodeEditor({
           value={value}
           height="100%"
           extensions={[markdown(), errorField]}
-          onChange={handleChange}
+          onChange={onChange}
           className="text-sm h-full"
-          theme="dark"
+          theme={editorTheme}
           basicSetup={{
             lineNumbers: true,
             highlightActiveLineGutter: true,

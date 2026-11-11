@@ -1,35 +1,51 @@
 import type React from "react"
+import type { Metadata, Viewport } from "next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
-import { BASE_URL, TITLE, DESCRIPTION } from "@/lib/config"
+import { BASE_URL, SITE_NAME, TITLE, DESCRIPTION } from "@/lib/config"
+import { JsonLd } from "@/components/json-ld"
+import { webApplicationSchema, websiteSchema } from "@/lib/structured-data"
 import "@/app/globals.css"
 
-export const metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  keywords:
-    "markdown, presentation, timed, cue-based, performance, web app, minimalist, guided, marks",
+export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
+  title: {
+    default: TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "markdown presentation",
+    "presentation timer",
+    "speaker notes",
+    "teleprompter",
+    "timed script",
+    "cue-based presentation",
+    "offline web app",
+  ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     type: "website",
-    url: BASE_URL,
+    url: "/",
     title: TITLE,
     description: DESCRIPTION,
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "TempoScript Preview",
-      },
-    ],
-    siteName: "TempoScript",
+    siteName: SITE_NAME,
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    images: ["/og-image.png"],
   },
   icons: {
     icon: [
@@ -39,10 +55,16 @@ export const metadata = {
       { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-    other: [{ rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#5bbad5" }],
   },
-  manifest: "/site.webmanifest",
-  generator: 'v0.dev'
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#16181d" },
+  ],
 }
 
 export default function RootLayout({
@@ -50,24 +72,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": TITLE,
-    "url": BASE_URL,
-    "description": DESCRIPTION
-  };
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Schema Markup como JSON stringificado */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-        />
-        <link rel="canonical" href={BASE_URL} />
+        <JsonLd data={websiteSchema} />
+        <JsonLd data={webApplicationSchema} />
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
