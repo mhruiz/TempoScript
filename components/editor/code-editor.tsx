@@ -56,7 +56,7 @@ export function CodeEditor({
   onExpand,
   onCollapse,
 }: CodeEditorProps) {
-  const view = useRef<EditorView>()
+  const view = useRef<EditorView | null>(null)
   const editorRef = useRef<HTMLDivElement>(null)
 
   const handleChange = useCallback(

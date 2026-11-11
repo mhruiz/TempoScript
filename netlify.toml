@@ -1,0 +1,25 @@
+[build.environment]
+  NODE_VERSION = "20"
+
+# The Netlify subdomain serves the same content as the custom domain.
+# Send it to the canonical host so search engines only see one site.
+[[redirects]]
+  from = "https://temposcript.netlify.app/*"
+  to = "https://www.temposcript.com/:splat"
+  status = 301
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+
+# The service worker must never be cached, or updates would not reach users.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

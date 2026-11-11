@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect, useRef, type PropsWithChildren } from "react"
+import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import ReactMarkdown, { type Components } from "react-markdown"
 import { TimerControl } from "./timer-control"
 import type { ContentBlock, PresentationState } from "@/types/presentation"
@@ -9,6 +9,22 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Card } from "@/components/ui/card"
 import { Keyboard } from "lucide-react"
 
+
+const markdownComponents: Components = {
+  code({ node: _node, className: _className, children, ...props }) {
+    return (
+      <code
+        className="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded text-sm text-gray-900 dark:text-gray-100"
+        {...props}
+      >
+        {children}
+      </code>
+    )
+  },
+  pre({ node: _node, ...props }) {
+    return <pre className="bg-gray-200 dark:bg-gray-800 p-3 rounded my-3 overflow-auto dark:text-gray-100" {...props} />
+  },
+}
 
 interface PresentationViewProps {
   blocks: ContentBlock[]
@@ -29,6 +45,12 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
   const blockRefs = useRef<(HTMLDivElement | null)[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const [lastDirection, setLastDirection] = useState<"forward" | "backward">("forward")
+
+  // Nested blocks spend their parent's time, so only top-level blocks add to the total
+  const totalTime = useMemo(
+    () => blocks.reduce((acc, block) => acc + (block.timeMarker?.level === 1 ? block.timeMarker.time : 0), 0),
+    [blocks],
+  )
 
   const currentBlock = blocks[state.currentBlockIndex]
   const currentTime = currentBlock?.timeMarker?.time || 0
@@ -251,21 +273,6 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
     }
   }, [state.currentBlockIndex, lastDirection])
 
-  const code = useCallback(
-    ({ node, className, children, ...props }: PropsWithChildren<any>) => {
-      return (
-        <code className="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded text-sm text-gray-900 dark:text-gray-100" {...props}>{children}</code>
-      )
-    },
-    []
-  )
-  const pre = useCallback(
-    ({ node, ...props }: PropsWithChildren<any>) => {
-      return <pre className="bg-gray-200 dark:bg-gray-800 p-3 rounded my-3 overflow-auto dark:text-gray-100" {...props} />
-    },
-    []
-  )
-
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -320,14 +327,14 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
                 index === state.currentBlockIndex ? "opacity-100" : "opacity-30"
               }`}
             >
-              <ReactMarkdown components={{ code, pre }}>{block.content}</ReactMarkdown>
+              <ReactMarkdown components={markdownComponents}>{block.content}</ReactMarkdown>
             </div>
           ))}
         </div>
       </div>
 
       <TimerControl
-        totalTime={blocks.reduce((acc, block) => acc + (block.timeMarker?.time || 0), 0)}
+        totalTime={totalTime}
         blockTime={currentTime}
         totalElapsed={state.totalElapsedTime}
         blockElapsed={state.blockElapsedTime}

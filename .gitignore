@@ -28,3 +28,14 @@ next-env.d.ts
 
 .vscode
 .idx
+
+# next-pwa build output
+/public/sw.js
+/public/sw.js.map
+/public/workbox-*.js
+/public/workbox-*.js.map
+/public/worker-*.js
+/public/fallback-*.js
+
+# local notes
+*.local.md

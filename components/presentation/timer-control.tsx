@@ -60,7 +60,10 @@ export function TimerControl({
               Auto-advance slides
             </Label>
           </div>
-          <span className="text-sm">Total: {formatTime(totalElapsed)}</span>
+          <span className="text-sm">
+            Total: {formatTime(totalElapsed)}
+            {totalTime > 0 && `/${formatTime(totalTime)}`}
+          </span>
         </div>
 
         <div className="flex items-center gap-4">
