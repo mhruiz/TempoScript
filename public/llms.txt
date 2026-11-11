@@ -6,7 +6,7 @@
 - Price: free, no account, no paid plan
 - Platform: any modern browser on desktop, tablet or phone; installable as a progressive web app; works offline after the first visit
 - Privacy: scripts are stored only in the browser's local storage; nothing is uploaded; no tracking
-- Source code: https://github.com/mhruiz/TempoScript
+- Source code: https://github.com/mhruiz/TempoScript (MIT license)
 - Languages: interface in English; overview page in Spanish
 
 ## What it is for
@@ -59,7 +59,14 @@ Second argument.
 - Timers: total elapsed and planned total, current section, and parent section.
 - Progress bar turns red and pulses when a section runs over.
 - Optional auto-advance to the next section when time runs out.
-- Keyboard: Space or P play/pause; Right arrow or N next; Left arrow or B previous; H help; Esc exit.
+- Timers follow the real clock, and the screen is kept awake where the browser allows it.
+- Adjustable text size and fullscreen.
+- Keyboard: Space or P play/pause; Right arrow or N next; Left arrow or B previous; F fullscreen; + and - text size; H help; Esc exit.
+
+## Files and sharing
+
+- Export the script as a Markdown file; import a Markdown or text file.
+- Copy a share link that holds the whole script, compressed, in the URL fragment. The fragment is not sent to the server.
 
 ## Pages
 

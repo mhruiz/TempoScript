@@ -102,6 +102,9 @@ const config = {
               color: "var(--foreground)",
               backgroundColor: "var(--muted)",
             },
+            // The typography plugin wraps inline code in literal backticks; hide them
+            "code::before": { content: '""' },
+            "code::after": { content: '""' },
           },
         },
       },

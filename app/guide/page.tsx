@@ -77,6 +77,8 @@ const SHORTCUTS = [
   { keys: ["Space", "P"], action: "Play or pause the timers" },
   { keys: ["→", "N"], action: "Go to the next section" },
   { keys: ["←", "B"], action: "Go back to the previous section" },
+  { keys: ["F"], action: "Enter or leave fullscreen" },
+  { keys: ["+", "-"], action: "Make the text larger or smaller" },
   { keys: ["H"], action: "Show or hide the shortcut help" },
   { keys: ["Esc"], action: "Exit presentation mode" },
 ]
@@ -107,6 +109,7 @@ export default function GuidePage() {
                 ["#errors", "Fixing errors"],
                 ["#presenting", "Presentation mode"],
                 ["#shortcuts", "Shortcuts"],
+                ["#files", "Files and share links"],
                 ["#storage", "Storage and offline use"],
               ].map(([href, label]) => (
                 <li key={href}>
@@ -258,6 +261,12 @@ export default function GuidePage() {
           </ul>
           <p className={muted}>
             Moving to another section resets the section timer. The total keeps counting until you pause or exit.
+            The timers follow the clock, so they stay correct if the tab is in the background. Where the browser
+            allows it, the screen stays awake while you present.
+          </p>
+          <p className={muted}>
+            The buttons at the top right change the text size and switch to fullscreen. The text size is remembered
+            for next time.
           </p>
         </section>
 
@@ -279,7 +288,7 @@ export default function GuidePage() {
                     <td className={`${td} whitespace-nowrap`}>
                       {shortcut.keys.map((key, index) => (
                         <span key={key}>
-                          {index > 0 && " or "}
+                          {index > 0 && (shortcut.keys[0] === "+" ? " / " : " or ")}
                           <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs">{key}</kbd>
                         </span>
                       ))}
@@ -296,13 +305,38 @@ export default function GuidePage() {
         </section>
 
         <section className="space-y-4">
+          <h2 id="files" className={h2}>
+            Files and share links
+          </h2>
+          <ul className={`list-disc space-y-2 pl-5 ${muted}`}>
+            <li>
+              <strong className="text-foreground">Export</strong> downloads the script as a Markdown file, markers
+              included. Use it as a backup or to move a script to another device.
+            </li>
+            <li>
+              <strong className="text-foreground">Import</strong> loads a Markdown or plain text file into the
+              editor. If you already have a script of your own, the app asks before replacing it.
+            </li>
+            <li>
+              <strong className="text-foreground">Copy link</strong> puts a link on the clipboard with the whole
+              script compressed inside it. The script is in the part of the address after{" "}
+              <code className={code}>#</code>, which browsers do not send to the server. Anyone who has the link can
+              read the script. Long scripts make long links, which some chat apps cut; export the file in that case.
+            </li>
+            <li>
+              <strong className="text-foreground">Load example</strong> brings back the sample script.
+            </li>
+          </ul>
+        </section>
+
+        <section className="space-y-4">
           <h2 id="storage" className={h2}>
             Storage and offline use
           </h2>
           <p className={muted}>
             Your script is saved automatically in the browser&apos;s local storage as you type. It stays on your
             device and is never sent to a server. Because it lives in one browser, it does not sync between devices,
-            and clearing the browser&apos;s site data deletes it. Keep a copy of important scripts in a file.
+            and clearing the browser&apos;s site data deletes it. Export important scripts to a file.
           </p>
           <p className={muted}>
             TempoScript is a progressive web app. After the first visit it loads without a connection, and you can

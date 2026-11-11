@@ -1,110 +1,123 @@
 # TempoScript
 
-## Overview
+**Timed speaker notes from a Markdown script.** Try it at [temposcript.com](https://www.temposcript.com/).
 
-TempoScript is a minimalist web application designed to transform your Markdown presentation scripts into guided, timed performances. It's ideal for situations where you need a cue-based presentation system but lack access to traditional presentation tools.  Think of it as a teleprompter for your Markdown notes, with built-in time management.
+TempoScript turns a plain Markdown script into speaker notes that keep time. You give each section a duration, press Start, and the app highlights where you are, runs the timers and warns you when a section goes over. It is for talks, lectures, pitches and recordings where you have no presenter view to guide you.
 
-This project is **98% AI-generated**.  It's an experiment to explore the capabilities of AI in software development, leveraging various AI tools throughout the entire process.
+- Free, no account
+- Works offline and installs as an app (PWA)
+- Your script stays in your browser; nothing is uploaded
+
+## How it works
+
+Write your script in Markdown and put a time marker on its own line before each section:
+
+```markdown
+?01:00
+# Opening
+Introduce yourself and state the problem.
+
+?05:00
+## Main idea
+
+??02:00
+First argument.
+
+??02:30
+Second argument.
+
+?!!
+## Questions
+```
+
+| Marker | Meaning |
+| --- | --- |
+| `?10:00` | Top-level section that lasts 10 minutes |
+| `??03:00` | Sub-section that lasts 3 minutes, inside the section above |
+| `???00:30` | Sub-sub-section that lasts 30 seconds |
+| `?!!` | Untimed section: elapsed time is shown, there is no limit |
+| `??!!` | Untimed sub-section: the parent section's time keeps running |
+
+Rules:
+
+- Each marker goes on its own line.
+- Time is `mm:ss` with two digits each. Seconds must be a multiple of 5.
+- A nested marker has exactly one more `?` than its parent.
+- A sub-section cannot be longer than its parent section.
+
+The editor underlines invalid markers and lists the errors. You cannot start presenting until they are fixed.
+
+The full reference is in the [guide](https://www.temposcript.com/guide).
 
 ## Features
 
-*   **Markdown Editing & Preview:** Write and edit your presentation script in Markdown. See a live preview of your rendered Markdown.
-*   **Time Markers:** Control the pacing of your presentation with a simple, intuitive time marker system.
-*   **Presentation Mode:** A distraction-free presentation view that highlights the current section and tracks your time.
-*   **Time Tracking:**  Visual timers for total elapsed time, current block time, and parent block time (if applicable).
-*   **Error Handling:** Real-time validation of time markers to ensure consistency and prevent errors.
-*   **Responsive Design:** Works seamlessly on desktop and mobile devices.
-*   **Local Storage:** Your work is automatically saved in your browser's local storage.
+- **Editor with live preview.** Markdown editor with marker validation as you type.
+- **Presentation mode.** The current section is highlighted and kept in view. Timers show total, section and parent section time. The progress bar turns red when you run over.
+- **Auto-advance.** Optionally move to the next section when the time runs out.
+- **Accurate timers.** They follow the clock, so a background tab does not slow them down. The screen stays awake where the browser allows it.
+- **Text size and fullscreen** in presentation mode.
+- **Import and export** Markdown files.
+- **Share links.** The whole script travels compressed in the URL fragment, which is not sent to the server.
+- **Light and dark themes.**
 
-## Getting Started
+### Keyboard shortcuts in presentation mode
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/mhruiz/TempoScript.git
-    cd TempoScript
-    ```
+| Key | Action |
+| --- | --- |
+| `Space` or `P` | Play or pause |
+| `→` or `N` | Next section |
+| `←` or `B` | Previous section |
+| `F` | Fullscreen |
+| `+` / `-` | Text size |
+| `H` | Show or hide the help |
+| `Esc` | Exit |
 
-2.  **Install Dependencies (with --force):**
-    ```bash
-    npm install --force
-    ```
-    **Important:**  Due to some dependency conflicts, you *must* use the `--force` flag during installation.  This is a known issue and a consequence of the experimental, AI-generated nature of this project.
+## Development
 
-3.  **Run the Development Server:**
-    ```bash
-    npm run dev
-    ```
+Requires Node.js 20 or later.
 
-4.  **Open in your Browser:**
-    Open `http://localhost:3000` in your web browser.
+```bash
+git clone https://github.com/mhruiz/TempoScript.git
+cd TempoScript
+npm install
+npm run dev
+```
 
-## How to Use
+Open `http://localhost:3000`.
 
-### View/Edit Mode
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript check |
+| `npm test` | Unit tests (Vitest) |
 
-*   **Write/Paste Markdown:** Enter your presentation script in the Markdown editor on the left.
-*   **Preview:** See a live preview of your rendered Markdown on the right.
-*   **Time Markers:** Use the following syntax to add time markers:
-    *   `?mm:ss`  -  Main block (e.g., `?10:00` for 10 minutes).
-    *   `??mm:ss` -  First-level sub-block.
-    *   `???mm:ss` - Second-level sub-block, and so on.
-    *   `?!!` - Section with no time control (timers still display, but no progress animation).
-    *   `??!!` - Nested section with no time control (use the appropriate number of `?` for the nesting level).
-    *    Seconds must be multiples of 5.
-*   **Error Handling:**  The application will highlight errors in your time markers (e.g., invalid format, time inconsistencies).  You must correct these errors before starting the presentation.
-* **Expand the Editor**: Double click on it
+The service worker is disabled in development. To test offline behaviour, run `npm run build && npm start`.
 
-### Presentation Mode
+### Project layout
 
-*   **Start Presentation:** Click the "Start Presentation" button.
-*   **Timers:**
-    *   **Total Elapsed Time:**  Shows the total time since the presentation started.
-    *   **Block Time:**  Shows the time allocated to the current block.
-    *   **Block Elapsed Time:** Shows the time spent in the current block.
-    *   **Parent Time (if applicable):**  Shows the time allocated to the parent block.
-    *   **Parent Elapsed Time (if applicable):** Shows the time spent within the current parent block.
-*   **Progress Indicator:** A visual bar that fills as the block time elapses.  It will change color and blink when the allocated time is exceeded.
-*   **Navigation:**
-    *   **Play/Pause:** Start and pause the timers (and auto-advancement).
-    *   **Next:**  Advance to the next block (resets block timer).
-    *   **Previous:** Go back to the previous block (resets block timer).
-    *   **End:** Exit presentation mode.
-*   **Auto-Advance:** A switch enables automatic advancement to the next slide when the block timer runs out.
-* **Keyboard shortcuts**:
-   * Space or P: Play/Pause
-   * -> or N: Next slide
-   * <- or B: Previous slide
-   * Esc: Exit presentation
-   * H: Toggle help
+| Path | Contents |
+| --- | --- |
+| `app/` | Pages (`/`, `/guide`, `/es`), metadata routes (robots, sitemap, manifest, Open Graph image) |
+| `components/editor/` | Editor, toolbar and preview |
+| `components/presentation/` | Presentation mode and timer bar |
+| `components/landing/` | Static overview shown below the editor |
+| `lib/time-marker.ts` | Marker parser and validator |
+| `lib/share.ts` | Share link encoding |
+| `lib/landing-content.ts` | Overview and FAQ text in English and Spanish |
 
-## Time Marker Rules
+### Deployment
 
-*   Seconds must be multiples of 5 (00, 05, 10, 15, ..., 55).
-*   Nested markers must have one more `?` than their parent.
-*   The time of a child block cannot exceed the time of its parent block.
-*   `?!!` blocks disable the progress animation but still track elapsed time within their parent.
-*   All time markers *must* be on their own line.
+The site is hosted on Netlify. Every push to `main` is deployed to production, so changes go through a pull request and its deploy preview first.
 
-## Development Notes
+## Built with
 
-This project uses:
+Next.js, React, Tailwind CSS, shadcn/ui, CodeMirror and react-markdown.
 
-*   **Next.js:**  React framework for building the application.
-*   **Tailwind CSS:**  Styling.
-*   **Shadcn/ui:**  UI components.
-*   **CodeMirror:**  Markdown editor with syntax highlighting.
-*   **React Markdown:**  Markdown rendering.
+The first version of this project was an experiment in building an app almost entirely with AI tools: Claude, ChatGPT, Replit, v0, Gemini, Grok and Project IDX.
 
-## Acknowledgements
+## License
 
-This project was almost entirely generated by AI, an experiment to assess the capabilities of current AI models in a real-world development scenario. Special thanks to:
-
-*   **Claude (Anthropic):**  For crafting the initial, detailed requirements document that formed the foundation of this project. 
-*   **ChatGPT (OpenAI):** For analyzing and refining the requirements, ensuring clarity and completeness.
-*   **Replit:**  For providing the initial project skeleton and development environment.
-* **V0 (Vercel)** For the complete UI implementation
-*   **Gemini (Google):**  For generating helpful guides and documentation.
-*   **Grok:**  For sparking some logo design ideas.
-*   **Project IDX:** For quick fixes.
-
-This project demonstrates the rapidly evolving potential of AI in software development. It serves as a proof-of-concept for how multiple AI tools can be orchestrated to build functional applications from natural language descriptions.
+[MIT](LICENSE)

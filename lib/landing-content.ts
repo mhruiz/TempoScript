@@ -110,7 +110,7 @@ export const LANDING_CONTENT: Record<Locale, LandingContent> = {
         },
         {
           question: "Is TempoScript free?",
-          answer: "Yes. It is free to use, has no paid plan and needs no account. The source code is public on GitHub.",
+          answer: "Yes. It is free to use, has no paid plan and needs no account. It is open source under the MIT license, with the code on GitHub.",
         },
         {
           question: "Does it work offline?",
@@ -120,7 +120,7 @@ export const LANDING_CONTENT: Record<Locale, LandingContent> = {
         {
           question: "Where is my script stored?",
           answer:
-            "Only in your browser's local storage, on your own device. Nothing is uploaded. Clearing your browser data removes the script, so keep a copy of anything important.",
+            "Only in your browser's local storage, on your own device. Nothing is uploaded. Clearing your browser data removes the script, so use Export to keep a copy of anything important.",
         },
         {
           question: "How is it different from a teleprompter or presenter view?",
@@ -135,7 +135,7 @@ export const LANDING_CONTENT: Record<Locale, LandingContent> = {
         {
           question: "Which keyboard shortcuts are there?",
           answer:
-            "In presentation mode: Space or P to play and pause, Right arrow or N for the next section, Left arrow or B for the previous one, H to show or hide the help, and Esc to exit.",
+            "In presentation mode: Space or P to play and pause, Right arrow or N for the next section, Left arrow or B for the previous one, F for fullscreen, + and - to change the text size, H to show or hide the help, and Esc to exit.",
         },
         {
           question: "Does it work on a phone or tablet?",
@@ -236,7 +236,7 @@ export const LANDING_CONTENT: Record<Locale, LandingContent> = {
         },
         {
           question: "¿TempoScript es gratis?",
-          answer: "Sí. Es gratis, no tiene plan de pago y no pide cuenta. El código fuente es público en GitHub.",
+          answer: "Sí. Es gratis, no tiene plan de pago y no pide cuenta. Es de código abierto con licencia MIT y el código está en GitHub.",
         },
         {
           question: "¿Funciona sin conexión?",
@@ -246,7 +246,7 @@ export const LANDING_CONTENT: Record<Locale, LandingContent> = {
         {
           question: "¿Dónde se guarda mi guion?",
           answer:
-            "Solo en el almacenamiento local de tu navegador, en tu propio dispositivo. No se sube nada. Si borras los datos del navegador, el guion se pierde, así que guarda una copia de lo importante.",
+            "Solo en el almacenamiento local de tu navegador, en tu propio dispositivo. No se sube nada. Si borras los datos del navegador, el guion se pierde, así que usa Export para guardar una copia de lo importante.",
         },
         {
           question: "¿En qué se diferencia de un teleprompter o de la vista de presentador?",
@@ -261,7 +261,7 @@ export const LANDING_CONTENT: Record<Locale, LandingContent> = {
         {
           question: "¿Qué atajos de teclado hay?",
           answer:
-            "En el modo presentación: Espacio o P para reproducir y pausar, Flecha derecha o N para la sección siguiente, Flecha izquierda o B para la anterior, H para mostrar u ocultar la ayuda y Esc para salir.",
+            "En el modo presentación: Espacio o P para reproducir y pausar, Flecha derecha o N para la sección siguiente, Flecha izquierda o B para la anterior, F para pantalla completa, + y - para cambiar el tamaño del texto, H para mostrar u ocultar la ayuda y Esc para salir.",
         },
         {
           question: "¿Funciona en móvil o tableta?",

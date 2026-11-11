@@ -15,11 +15,3 @@ export interface ValidationError {
   line: number
 }
 
-export interface PresentationState {
-  currentBlockIndex: number
-  isPlaying: boolean
-  totalElapsedTime: number
-  blockElapsedTime: number
-  parentElapsedTime: number
-  shouldAdvance: boolean
-}
