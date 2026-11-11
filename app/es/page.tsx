@@ -7,7 +7,7 @@ import { faqSchema } from "@/lib/structured-data"
 
 const title = "TempoScript: guion con tiempos y notas de orador en Markdown"
 const description =
-  "Convierte un guion en Markdown en notas de orador con tiempos. Añade marcadores como ?05:00 a cada sección y no te pases de tiempo al presentar. Gratis, sin conexión y sin registro."
+  "Convierte un guion en Markdown en notas de orador con tiempos. Marca cada sección con ?05:00 y no te pases al presentar. Gratis, sin conexión y sin registro."
 
 export const metadata: Metadata = {
   title: { absolute: title },

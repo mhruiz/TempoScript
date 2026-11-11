@@ -5,7 +5,7 @@ import { REPO_URL } from "@/lib/config"
 
 const title = "Guide: time markers, presentation mode and shortcuts"
 const description =
-  "Complete reference for TempoScript: how to write time markers such as ?05:00, nest sections, add untimed blocks, run presentation mode and use the keyboard shortcuts."
+  "TempoScript reference: time markers such as ?05:00, nested and untimed sections, error fixes, presentation mode and keyboard shortcuts."
 
 export const metadata: Metadata = {
   title,
