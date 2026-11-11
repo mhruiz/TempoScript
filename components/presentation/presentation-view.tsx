@@ -308,9 +308,9 @@ export function PresentationView({ blocks, onEnd }: PresentationViewProps) {
       <div ref={containerRef} className="container mx-auto p-6 max-w-7xl">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 dark:from-white dark:to-white/80 bg-clip-text text-transparent">
+            <p className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 dark:from-white dark:to-white/80 bg-clip-text text-transparent">
               TempoScript
-            </h1>
+            </p>
             <ThemeToggle />
           </div>
         </div>

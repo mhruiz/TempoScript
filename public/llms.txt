@@ -1,0 +1,68 @@
+# TempoScript
+
+> TempoScript is a free, offline-capable web app that turns a Markdown script into timed speaker notes. The speaker marks each section of the script with a duration (for example `?05:00`), and presentation mode highlights the current section, runs timers and warns when a section goes over its time.
+
+- URL: https://www.temposcript.com/
+- Price: free, no account, no paid plan
+- Platform: any modern browser on desktop, tablet or phone; installable as a progressive web app; works offline after the first visit
+- Privacy: scripts are stored only in the browser's local storage; nothing is uploaded; no tracking
+- Source code: https://github.com/mhruiz/TempoScript
+- Languages: interface in English; overview page in Spanish
+
+## What it is for
+
+Use TempoScript when you speak against the clock and have no presenter view: conference talks, lectures, thesis defences, pitches, podcasts, live streams, video recording, or slides shown as a PDF or a shared browser tab. It is not a slide tool and not a scrolling teleprompter. It is a script with a time budget per section.
+
+## Time marker syntax
+
+A time marker is a line that starts with question marks. It sets the duration of the text below it, up to the next marker.
+
+| Marker | Meaning |
+| --- | --- |
+| `?10:00` | Top-level section that lasts 10 minutes |
+| `??03:00` | Sub-section that lasts 3 minutes, inside the section above |
+| `???00:30` | Sub-sub-section that lasts 30 seconds |
+| `?!!` | Untimed section: elapsed time is shown, there is no limit |
+| `??!!` | Untimed sub-section: the parent section's time keeps running |
+
+Rules:
+
+- Each marker goes on its own line.
+- Time is `mm:ss` with two digits each; seconds must be a multiple of 5.
+- A nested marker has exactly one more `?` than its parent.
+- A sub-section cannot be longer than its parent section.
+- The planned total is the sum of the timed top-level sections.
+
+Example:
+
+```markdown
+?01:00
+# Opening
+Introduce yourself and state the problem.
+
+?05:00
+## Main idea
+
+??02:00
+First argument.
+
+??02:30
+Second argument.
+
+?!!
+## Questions
+```
+
+## Presentation mode
+
+- Highlights the current section and dims the rest.
+- Timers: total elapsed and planned total, current section, and parent section.
+- Progress bar turns red and pulses when a section runs over.
+- Optional auto-advance to the next section when time runs out.
+- Keyboard: Space or P play/pause; Right arrow or N next; Left arrow or B previous; H help; Esc exit.
+
+## Pages
+
+- [Editor and overview](https://www.temposcript.com/): the app itself, followed by an explanation and FAQ
+- [Guide](https://www.temposcript.com/guide): full reference for markers, errors, presentation mode and shortcuts
+- [Resumen en español](https://www.temposcript.com/es): overview and FAQ in Spanish

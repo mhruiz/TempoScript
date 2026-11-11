@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from "next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { BASE_URL, SITE_NAME, TITLE, DESCRIPTION } from "@/lib/config"
+import { JsonLd } from "@/components/json-ld"
+import { webApplicationSchema, websiteSchema } from "@/lib/structured-data"
 import "@/app/globals.css"
 
 export const metadata: Metadata = {
@@ -22,9 +24,6 @@ export const metadata: Metadata = {
     "cue-based presentation",
     "offline web app",
   ],
-  alternates: {
-    canonical: "/",
-  },
   robots: {
     index: true,
     follow: true,
@@ -40,14 +39,6 @@ export const metadata: Metadata = {
     url: "/",
     title: TITLE,
     description: DESCRIPTION,
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "TempoScript Preview",
-      },
-    ],
     siteName: SITE_NAME,
     locale: "en_US",
   },
@@ -55,7 +46,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    images: ["/og-image.png"],
   },
   icons: {
     icon: [
@@ -82,21 +72,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": SITE_NAME,
-    "url": BASE_URL,
-    "description": DESCRIPTION
-  };
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-        />
+        <JsonLd data={websiteSchema} />
+        <JsonLd data={webApplicationSchema} />
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
